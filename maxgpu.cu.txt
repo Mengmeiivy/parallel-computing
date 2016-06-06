@@ -50,14 +50,11 @@ int main(int argc, char *argv[])
     }
     printf("\n");
   */
-
-    if (size != 100000000) {
     
     // allocate and copy memory 
     long * numbers_d;
     long * result_d;
     
-
 
     cudaMalloc((void **)&numbers_d, size*sizeof(long));
 
@@ -82,42 +79,6 @@ int main(int argc, char *argv[])
     // free device memory 
     cudaFree(numbers_d);
     cudaFree(result_d);
-
-    }
-
-    else {
-    // allocate and copy memory 
-    long * numbers_d;
-    long * result_d;
-    cudaMalloc((void **)&numbers_d, 50000000*sizeof(long));
-    cudaMemcpy(numbers_d, numbers, 50000000*sizeof(long), cudaMemcpyHostToDevice);
-    cudaMalloc((void **)&result_d, sizeof(long));
-    cudaMemcpy(result_d, result, sizeof(long), cudaMemcpyHostToDevice);
-
-    // get and set properties 
-    int num_of_threads = 1024;
-    int num_of_blocks = (int)ceil(50000000/(double)num_of_threads);
-
-    // call the kernel 
-    getmaxcu<<<num_of_blocks, num_of_threads>>>(numbers_d, result_d, 50000000);
-
-    
-    cudaFree(numbers_d);
-
-    
-    cudaMalloc((void **)&numbers_d, 50000000*sizeof(long));
-    cudaMemcpy(numbers_d, numbers+50000000, 50000000*sizeof(long), cudaMemcpyHostToDevice);
-    getmaxcu<<<num_of_blocks, num_of_threads>>>(numbers_d, result_d, 50000000);
-    
-    
-
-    // copy the result back 
-    cudaMemcpy(result, result_d, sizeof(long), cudaMemcpyDeviceToHost);
-
-    // free device memory 
-    cudaFree(numbers_d);
-    cudaFree(result_d);
-    }
     
 
     // print the result
