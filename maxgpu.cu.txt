@@ -1,0 +1,136 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <cuda.h>
+#include <math.h>
+
+__global__ 
+void getmaxcu(long* numbers_d, long* result_d, int size) {
+  int i = 0;
+  i = threadIdx.x + blockDim.x * blockIdx.x;
+  if (i < size) {
+    atomicMax((int*)result_d, (int)numbers_d[i]);
+  }
+}
+
+int main(int argc, char *argv[])
+{
+   long size = 0;  // The size of the array
+   long i;  // loop index
+   long * numbers; //pointer to the array
+   long * result;
+   result = (long*)malloc(sizeof(long));
+   result[0] = 0;
+    
+    if(argc !=2)
+    {
+       printf("usage: maxseq num\n");
+       printf("num = size of the array\n");
+       exit(1);
+    }
+   
+    size = atol(argv[1]);
+
+    numbers = (long *)malloc(size * sizeof(long));
+    if( !numbers )
+    {
+       printf("Unable to allocate mem for an array of size %ld\n", size);
+       exit(1);
+    }    
+
+    //srand(0);
+     srand(time(NULL)); // setting a seed for the random number generator
+    // Fill-up the array with random numbers from 0 to size-1 
+    for( i = 0; i < size; i++)
+       numbers[i] = rand() % size;    
+   
+   /*
+    for(int i = 0; i < size; i++) {
+      printf("%ld ", numbers[i]);
+    }
+    printf("\n");
+  */
+
+    if (size != 100000000) {
+    
+    // allocate and copy memory 
+    long * numbers_d;
+    long * result_d;
+    
+
+
+    cudaMalloc((void **)&numbers_d, size*sizeof(long));
+
+
+    cudaMemcpy(numbers_d, numbers, size*sizeof(long), cudaMemcpyHostToDevice);
+    cudaMalloc((void **)&result_d, sizeof(long));
+    cudaMemcpy(result_d, result, sizeof(long), cudaMemcpyHostToDevice);
+
+    // get and set properties 
+    int num_of_threads = 1024;
+    int num_of_blocks = (int)ceil(size/(double)num_of_threads);
+
+    
+
+    // call the kernel 
+    getmaxcu<<<num_of_blocks, num_of_threads>>>(numbers_d, result_d, size);
+
+    // copy the result back 
+    cudaMemcpy(result, result_d, sizeof(long), cudaMemcpyDeviceToHost);
+
+
+    // free device memory 
+    cudaFree(numbers_d);
+    cudaFree(result_d);
+
+    }
+
+    else {
+    // allocate and copy memory 
+    long * numbers_d;
+    long * result_d;
+    cudaMalloc((void **)&numbers_d, 50000000*sizeof(long));
+    cudaMemcpy(numbers_d, numbers, 50000000*sizeof(long), cudaMemcpyHostToDevice);
+    cudaMalloc((void **)&result_d, sizeof(long));
+    cudaMemcpy(result_d, result, sizeof(long), cudaMemcpyHostToDevice);
+
+    // get and set properties 
+    int num_of_threads = 1024;
+    int num_of_blocks = (int)ceil(50000000/(double)num_of_threads);
+
+    // call the kernel 
+    getmaxcu<<<num_of_blocks, num_of_threads>>>(numbers_d, result_d, 50000000);
+
+    
+    cudaFree(numbers_d);
+
+    
+    cudaMalloc((void **)&numbers_d, 50000000*sizeof(long));
+    cudaMemcpy(numbers_d, numbers+50000000, 50000000*sizeof(long), cudaMemcpyHostToDevice);
+    getmaxcu<<<num_of_blocks, num_of_threads>>>(numbers_d, result_d, 50000000);
+    
+    
+
+    // copy the result back 
+    cudaMemcpy(result, result_d, sizeof(long), cudaMemcpyDeviceToHost);
+
+    // free device memory 
+    cudaFree(numbers_d);
+    cudaFree(result_d);
+    }
+    
+
+    // print the result
+    printf(" The maximum number in the array is: %ld\n", result[0]);
+
+    free(numbers);
+    exit(0);
+}
+
+
+
+
+
+
+
+
