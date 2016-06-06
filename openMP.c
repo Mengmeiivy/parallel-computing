@@ -7,13 +7,11 @@
 
 int main(int argc, char *argv[]) {
 
-
 	char *N = argv[1];
 	char *t = argv[2];
 	int num = atoi(N);
 	int thread = atoi(t);
 	int stop = (num + 1) / 2;
-
 
 	int prime[num - 1];
 	double tstart = 0.0, ttaken;
@@ -57,19 +55,4 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	fclose(fp);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
