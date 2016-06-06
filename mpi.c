@@ -20,8 +20,6 @@ void get_input();  /* Read input from file */
 
 /********************************/
 
-
-
 /* Function definitions: functions are ordered alphabetically ****/
 /*****************************************************************/
 
@@ -63,7 +61,6 @@ void check_matrix()
      exit(1);
   }
 }
-
 
 /******************************************************/
 /* Read input from file */
@@ -149,11 +146,8 @@ void get_input(char filename[])
 
 int main(int argc, char *argv[])
 {
-
-
   int i, j;
   int nit = 0; /* number of iterations */
-
   
   if( argc != 2)
   {
@@ -180,7 +174,6 @@ int main(int argc, char *argv[])
   int count;
   int first_i;
   int last_i;
-
   
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
@@ -190,7 +183,6 @@ int main(int argc, char *argv[])
   double overhead = 0;
   double begin, end;
   double computation = 0;
-
 
   int quotient = num / comm_sz;
   int remain = num % comm_sz;
@@ -233,7 +225,6 @@ int main(int argc, char *argv[])
     finish = MPI_Wtime();
     overhead += finish - start; 
     
-
     for (i = 0; i < num; i++)
       x[i] = sum_new_x[i];
     
@@ -246,15 +237,11 @@ int main(int argc, char *argv[])
  
     printf("total number of iterations: %d\n", nit);  
     }
-
     
   } 
   
   MPI_Barrier(MPI_COMM_WORLD);
   MPI_Finalize();
-  //printf("Process %d communication time is %f.\n", my_rank, overhead);
-  //printf("Process %d computation time is %f.\n", my_rank, computation);
- 
 
   exit(0);
 
