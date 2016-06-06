@@ -54,11 +54,9 @@ int main(int argc, char *argv[])
     // allocate and copy memory 
     long * numbers_d;
     long * result_d;
-    
 
     cudaMalloc((void **)&numbers_d, size*sizeof(long));
-
-
+    
     cudaMemcpy(numbers_d, numbers, size*sizeof(long), cudaMemcpyHostToDevice);
     cudaMalloc((void **)&result_d, sizeof(long));
     cudaMemcpy(result_d, result, sizeof(long), cudaMemcpyHostToDevice);
@@ -67,20 +65,16 @@ int main(int argc, char *argv[])
     int num_of_threads = 1024;
     int num_of_blocks = (int)ceil(size/(double)num_of_threads);
 
-    
-
     // call the kernel 
     getmaxcu<<<num_of_blocks, num_of_threads>>>(numbers_d, result_d, size);
 
     // copy the result back 
     cudaMemcpy(result, result_d, sizeof(long), cudaMemcpyDeviceToHost);
 
-
     // free device memory 
     cudaFree(numbers_d);
     cudaFree(result_d);
     
-
     // print the result
     printf(" The maximum number in the array is: %ld\n", result[0]);
 
